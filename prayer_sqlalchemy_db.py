@@ -2,7 +2,7 @@ from application import db
 from sqlalchemy import exc
 from pprint import pprint
 import pandas as pd
-from datetime import datetime
+from datetime import datetime,timedelta
 import pytz
 
 
@@ -13,11 +13,11 @@ import pytz
 class PrayerDB(db.Model):
     __tablename__ = 'prayer_db'
     id = db.Column('entry',db.INTEGER, primary_key=True, autoincrement=True)
-    timestamp = db.Column('time_stamp',db.DATETIME(timezone=True),default=datetime.now(pytz.timezone('US/Central').replace(microsecond=0)))
+    timestamp = db.Column('time_stamp',db.DATETIME,default=datetime.now().replace(microsecond=0))
     number = db.Column('phone_number', db.String(length=13),nullable=False)
     name = db.Column('name',db.String(25),nullable=True)
     prayer = db.Column('prayer',db.TEXT,nullable=False)
-    private = db.Column('Private',db.BOOLEAN,default=True)
+    private = db.Column('private',db.BOOLEAN,default=True)
     __table_args__ = db.UniqueConstraint('phone_number','prayer',name='unique_prayer'),
 
 
