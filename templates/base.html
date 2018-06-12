@@ -1,0 +1,31 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}{% endblock %}
+
+
+<!--Navigation Bar. -->
+    {% block navbar %}
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="'navbar-brand"
+                        {% if content.href %}
+                            href="{{ url_for( content.href) }}"
+                        {% else %}
+                            href="{{ url_for('index') }}"
+                        {% endif %}>
+                            {%  if content.header %}
+                                {{ content.header }}
+                            {% else %}
+                                {{ self.title() }}
+                            {% endif %}
+                    </a>
+                </div>
+            </div>
+        </nav>
+    {% endblock %}
+
+{% block page_title %}{% endblock %}
+
+
+{% block content %}{% endblock %}

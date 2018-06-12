@@ -1,14 +1,11 @@
-from flask_sqlalchemy import SQLAlchemy
-from application import application
+from application import db
 from sqlalchemy import exc
 from pprint import pprint
 import pandas as pd
 from datetime import datetime
+import pytz
 
-application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///prayer_data_table.db'
-application.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 
-db = SQLAlchemy(application)
 
 #ToDo Figure out how to make the timestamp the right timezone.
 
@@ -16,22 +13,16 @@ db = SQLAlchemy(application)
 class PrayerDB(db.Model):
     __tablename__ = 'prayer_db'
     id = db.Column('entry',db.INTEGER, primary_key=True, autoincrement=True)
-    timestamp = db.Column('time_stamp',db.DATETIME(timezone=True),default=db.func.now())
+    timestamp = db.Column('time_stamp',db.DATETIME(timezone=True),default=datetime.now(pytz.timezone('US/Central').replace(microsecond=0)))
     number = db.Column('phone_number', db.String(length=13),nullable=False)
     name = db.Column('name',db.String(25),nullable=True)
     prayer = db.Column('prayer',db.TEXT,nullable=False)
-    __table_args__ = db.UniqueConstraint('phone_number','prayer',name='unique_prayer'),   #This needs to make
+    private = db.Column('Private',db.BOOLEAN,default=True)
+    __table_args__ = db.UniqueConstraint('phone_number','prayer',name='unique_prayer'),
 
 
 
-class Practice(db.Model):
-    __tablename__ = 'prayer_db'
-    id = db.Column('entry',db.INTEGER, primary_key=True, autoincrement=True)
-    timestamp = db.Column('time_stamp',db.DATETIME(timezone=True),default=db.func.now())
-    number = db.Column('phone_number', db.String(length=13),nullable=False)
-    name = db.Column('name',db.String(25),nullable=True)
-    prayer = db.Column('prayer',db.TEXT,nullable=False)
-    __table_args__ = db.UniqueConstraint('phone_number','prayer',name='unique_prayer'),   #This needs to make
+
 
 
 
