@@ -12,9 +12,9 @@ import pytz
 
 class PrayerDB(db.Model):
     __tablename__ = 'prayer_db'
-    id = db.Column('entry',db.INTEGER, primary_key=True, autoincrement=True)
-    timestamp = db.Column('time_stamp',db.DATETIME,default=datetime.now().replace(microsecond=0))
-    number = db.Column('phone_number', db.String(length=13),nullable=False)
+    id = db.Column('id',db.INTEGER, primary_key=True, autoincrement=True)
+    timestamp = db.Column('timestamp',db.DATETIME,default=db.func.now())
+    phone_number = db.Column('phone_number', db.String(length=13),nullable=False)
     name = db.Column('name',db.String(25),nullable=True)
     prayer = db.Column('prayer',db.TEXT,nullable=False)
     private = db.Column('private',db.BOOLEAN,default=True)
@@ -62,12 +62,11 @@ def outer_join_df(imp_df=None):
 
 
 def create_prayer_df():
-    all_prayers = PrayerDB.query.all()
     headers = PrayerDB.__table__.columns.keys()
-    rows = [[entry.id,entry.timestamp,entry.number,entry.name, entry.prayer] for entry in all_prayers]
+    rows = [[getattr(row,col) for col in headers] for row in PrayerDB.query.all()]
     #pprint(headers)
     #pprint(rows)
-    df = pd.DataFrame(data=rows,columns=headers).set_index('entry')
+    df = pd.DataFrame(data=rows,columns=headers).set_index('id')
     print(df.to_string())
     return df
 
@@ -83,6 +82,13 @@ def create_excel(df=None):
     print('Successfully created Excel File')
 
 
+def create_csv(df=None):
+    call_dt = datetime.now().strftime('%m-%d-%y_%H:%M')
+    if df is None:
+        df = create_prayer_df()
+    df.to_csv(f'prayers_{call_dt}.csv')
+    print('Successfully made the csv')
+
 
 
 if __name__ == '__main__':
@@ -90,3 +96,4 @@ if __name__ == '__main__':
     #create_excel()
     print(datetime.now().strftime('%m-%d-%y_%H:%M'))
     # update_from_excel('./prayer_05-28-18_21:33.xlsx')
+    create_csv()

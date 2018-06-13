@@ -1,15 +1,29 @@
 from flask import Flask, request, render_template, url_for
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from twilio.twiml import messaging_response
+from datetime import datetime
+from prayer_tools import find_most_recent_excel
+from os.path import abspath
+from glob import glob
+
 
 application = Flask(__name__)
 application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///prayer_data_table.db'
 application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+application.config['MAIL_SERVER'] = 'smtp.gmail.com'
+application.config['MAIL_PORT'] = 587
+application.config['MAIL_USE_TLS'] = True
+application.config['MAIL_USERNAME'] = 'danny.jesus.diaz.94@gmail.com'
+application.config['MAIL_PASSWORD'] = 'Smokes305'
+application.config['MAIL_DEFAULT_SENDER'] = 'danny.jesus.diaz.94@gmail.com'
+
 
 
 db = SQLAlchemy(application)
 bs = Bootstrap(application)
+mail = Mail(application)
 
 
 if __name__ == '__main__':
@@ -35,8 +49,26 @@ def prayer_text():
         number = request.form['From']
         pray_request = request.form['Body']
 
+@application.route('/send_excel_email/<filename>')
+@application.route('/send_excel_email/')
+def send_excel(filename=None, attach=None):
+    time = datetime.now().strftime('%m/%d %H:%M')
+    email = Message(f'Prayer Bot Email {time}',
+                  #sender='danny.jesus.diaz.94@gmail.com',
+                  recipients=['danny.jesus.diaz.94@gmail.com','maritzaashtonsirven@gmail.com'])
 
+    if filename is None:
+        #file_path = abspath(find_most_recent_excel())
+        file_path = glob('*.csv')[0]
+        print(file_path)
+        email.attach(file_path,content_type='text/csv')
+        #email.attach(bytes(file_path,encoding='UTF-8'), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    else:
+        email.body = 'A filename was passed to the url.'
 
+    mail.send(email)
+    print('The email has been sent')
+    return 'email sent!'
 
 if __name__ == '__main__':
     application.run(debug=True)
