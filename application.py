@@ -10,14 +10,7 @@ from glob import glob
 
 
 application = Flask(__name__)
-application.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///prayer_data_table.db'
-application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-application.config['MAIL_SERVER'] = 'smtp.gmail.com'
-application.config['MAIL_PORT'] = 587
-application.config['MAIL_USE_TLS'] = True
-application.config['MAIL_USERNAME'] = 'danny.jesus.diaz.94@gmail.com'
-application.config['MAIL_PASSWORD'] = 'Smokes305'
-application.config['MAIL_DEFAULT_SENDER'] = 'danny.jesus.diaz.94@gmail.com'
+application.config.from_pyfile('prayerconfig.cfg')
 
 
 
