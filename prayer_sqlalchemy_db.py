@@ -1,5 +1,14 @@
-from application import db
+from flask_login import UserMixin
+from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user
+from prayer_bot.application import db
+
+from enum import Enum
 from sqlalchemy import exc
+
+#from sqlalchemy_utils.types.choice import ChoiceType   #This is another way to do Enum but it does not show up on the flask admin page so I am trying to do Enum
+
+
 from pprint import pprint
 import pandas as pd
 from datetime import datetime,timedelta
@@ -19,6 +28,47 @@ class PrayerDB(db.Model):
     prayer = db.Column('prayer',db.TEXT,nullable=False)
     private = db.Column('private',db.BOOLEAN,default=True)
     __table_args__ = db.UniqueConstraint('phone_number','prayer',name='unique_prayer'),
+
+
+class Groups(Enum):
+    SURFACE = '18-21'
+    MVMT = '22-25'
+    LOFT = '26-29'
+    NA = 'N/A'
+
+
+
+class PrayerTeam(db.Model,UserMixin):
+    __tablename__ = 'prayer_team'
+
+    id = db.Column('id', db.INTEGER, primary_key=True)
+    name = db.Column('name', db.String(length=40), nullable=False)
+    phone_number = db.Column('phone_number', db.String(length=15), nullable=False)
+    email = db.Column('email', db.String(length=50), nullable=False)
+    group = db.Column('group', db.Enum(Groups), nullable=False)
+
+
+
+#table for User accounts to login
+class Users(db.Model,UserMixin):
+    __tablename__ = 'users_db'
+    id = db.Column(db.INTEGER, primary_key=True)
+    username = db.Column(db.String(length=40), nullable=False)
+    password = db.Column(db.String(length=25), nullable=False)
+    __table_args__ = db.UniqueConstraint('username','password'),
+
+
+
+
+#Create your own ModelView class where you override the is_accessible method in order to not allow the admin page to be accessible to everyone.
+class MyModelView(ModelView):
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+
+
+
 
 
 
@@ -76,7 +126,7 @@ def create_excel(df=None):
     call_dt = datetime.now().strftime('%m-%d-%y_%H:%M')
     if df is None:
         df =create_prayer_df()
-    writer = pd.ExcelWriter(path=f'prayer_{call_dt}.xlsx',engine='xlsxwriter')
+    writer = pd.ExcelWriter(path=f'../prayers_{call_dt}.xlsx',engine='xlsxwriter')
     df.to_excel(writer)
     writer.save()
     print('Successfully created Excel File')
@@ -86,7 +136,7 @@ def create_csv(df=None):
     call_dt = datetime.now().strftime('%m-%d-%y_%H:%M')
     if df is None:
         df = create_prayer_df()
-    df.to_csv(f'prayers_{call_dt}.csv')
+    df.to_csv(path_or_buf=f'../prayers_{call_dt}.csv',)
     print('Successfully made the csv')
 
 
@@ -96,4 +146,5 @@ if __name__ == '__main__':
     #create_excel()
     print(datetime.now().strftime('%m-%d-%y_%H:%M'))
     # update_from_excel('./prayer_05-28-18_21:33.xlsx')
-    create_csv()
+    #create_csv()
+    db.create_all()
