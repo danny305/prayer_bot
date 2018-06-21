@@ -60,7 +60,7 @@ class Users(db.Model,UserMixin):
 
 
 
-
+#Todo figure out how to do this in order for it to work correctly.
 #Create your own ModelView class where you override the is_accessible method in order to not allow the admin page to be accessible to everyone.
 class MyModelView(ModelView):
 
