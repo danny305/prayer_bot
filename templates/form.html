@@ -1,38 +1,43 @@
+{% extends "base.html" %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Form</title>
+    <title>{{ title }}</title>
 </head>
 <body>
+{% block content %}
+    {{ super() }}
     <h1>Login</h1>
 
-<form method="POST" action="{{ url_for('form') }}">
+<form method="POST" action="{{ url_for('form') }}" novalidate>
     {{ form.csrf_token }}
-    {{ form.username.label }}
-    {{ form.username }}
+    <p>
+        {{ form.username.label }}<font color="red">*</font>
+    {{ form.username() }}
     <ul>
         {% for error in form.username.errors %}
             <li style="color:red;">{{ error }}</li>
         {% endfor %}
     </ul><br>
-    {{ form.password.label }}
-    {{ form.password }}
+    </p>
+
+    <p>
+    {{ form.password.label }}<font color="red">*</font>
+    {{ form.password() }}
     <ul>
         {% for error in form.password.errors %}
             <li style="color:red;">{{ error }}</li>
         {% endfor %}
     </ul><br>
+    </p>
+    <!--
     <input type="submit" value="Submit">
+    -->
+    {{ form.remember_me() }}{{ form.remember_me.label }}<br><br>
+    {{ form.submit() }}
 </form>
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
+{% endblock content %}
 </body>
 </html>

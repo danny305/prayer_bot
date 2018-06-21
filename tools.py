@@ -1,7 +1,7 @@
 import re
 from glob import glob
 from collections import namedtuple
-from prayer_bot.prayer_sqlalchemy_db import create_csv,create_excel
+from .models import create_csv,create_excel
 
 name_re = re.compile(' ([A-Z][A-Za-z]+\s+[A-Z][A-Za-z]+|[A-Z][A-Za-z]+)')
 file_format = re.compile('([0-9]{2})-([0-9]{2})-.{3}([0-9]{2})')
